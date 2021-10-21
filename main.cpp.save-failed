@@ -1,0 +1,598 @@
+#include <iostream>
+#include <fstream>
+#include <SFML/Graphics.hpp>
+#include <vector>
+#include <cmath>
+#include <string>
+using namespace std;
+using namespace sf;
+
+
+//Collision when he is moving right
+bool CollisionRight(Sprite S1, RectangleShape R1, bool Right)
+{
+    if (S1.getGlobalBounds().intersects(R1.getGlobalBounds()) && Right == true)
+    {
+        return true;
+    }
+
+    else
+    {
+        return false;
+    }
+
+}
+//Collision when he is moving left
+bool CollisionLeft(Sprite S1, RectangleShape R1, bool Left)
+{
+    if (S1.getGlobalBounds().intersects(R1.getGlobalBounds()) && Left == true)
+    {
+        return true;
+    }
+
+    else
+    {
+        return false;
+    }
+}
+//Collision when he is moving up
+bool CollisionUp(Sprite S1, RectangleShape R1, bool Up)
+{
+    if (S1.getGlobalBounds().intersects(R1.getGlobalBounds()) && Up == true)
+    {
+        return true;
+    }
+
+    else
+    {
+        return false;
+    }
+}
+//Collision when he is moving down
+bool CollisionDown(Sprite S1, RectangleShape R1, bool Down)
+{
+    if (S1.getGlobalBounds().intersects(R1.getGlobalBounds()) && Down == true)
+    {
+        return true;
+    }
+
+    else
+    {
+        return false;
+    }
+}
+
+
+
+int main()
+{
+    RenderWindow window(VideoMode(800,600),"SFML Works"); //creates a window on the screen that is 800 by 600
+    window.setFramerateLimit(60); //sets the game loop to run 60 times per second
+
+    RectangleShape Map;
+    vector<RectangleShape> barrier;
+    Map.setSize(Vector2f(753, 552));
+    Map.setPosition(400, 300);
+    Map.setOrigin(376.5, 276);
+    Texture MapTexture;
+    MapTexture.loadFromFile("maps.png");
+    Map.setTexture(&MapTexture);
+    Sprite Pacman;
+    Texture sprites;
+    sprites.loadFromFile("pacman.png");
+    int texty = 125;
+    int counter = 0;
+    Pacman.setTexture(sprites);
+    Pacman.setPosition(400, 400);
+    Pacman.setOrigin(50, 50);
+    Pacman.setScale(0.3, 0.3);
+    bool Right = false;
+    bool Left = false;
+    bool Up = false;
+    bool Down = false;
+    bool move_Right = false;
+    bool move_Left = false;
+    bool move_Up = false;
+    bool move_Down = false;
+    bool PacRight = true;
+    bool PacLeft = true;
+    bool collideleft = false;
+    bool collideright = false;
+    bool collideup = false;
+    bool collidedown = false;
+    vector<RectangleShape> Paclives;
+    int PaclivesX = 650;
+    int ScoreCounter = 0;
+    int DotScores = 0;
+
+    Text Scores;
+    Font fonts;
+    fonts.loadFromFile("techno_hideo.ttf");
+    Scores.setFont(fonts);
+    Scores.setPosition(25, 572.5);
+    Scores.setScale(0.75, 0.75);
+
+    int Pacmovex1 = 0;
+    int Pacmovey1 = 0;
+    int Pacmovex2 = 2;
+    int Pacmovey2 = 2;
+    float dotx = 3.0;
+    int dotsx = 45;
+    int dotsy = 45;
+    int wallsx[4] = {95, 145, 95, 145};
+    int wallsy[4] = {95, 95, 145, 145};
+    bool gamestart = true;
+    char grid[11][15];
+    vector<vector<CircleShape> > dots(11, vector<CircleShape>(15));
+    ifstream infile;
+    infile.open("grid.txt");
+    for (int i = 0; i <11; i++)
+    {
+        for (int j = 0 ; j < 15; j++)
+        {
+            //Regular Pellets
+            infile>>grid[i][j];
+            dots[i][j].setRadius(5.0);
+            dots[i][j].setOrigin(5.0,5.0);
+            dots[i][j].setPosition(50 + j*50, 50+i*50);
+
+            if ((i == 1 && j == 1) || (i == 1 && j == 2) || (i == 2 && j == 1) || (i == 2 && j == 2) || (i == 8 && j == 2) || (i == 8 && j == 1) || (i == 9 && j == 2) || (i == 9 && j == 2) || (i == 4 && j == 1) || (i == 6 && j == 1) || (i == 4 && j == 2) || (i == 5 && j == 2) || (i == 6 && j == 2) || (i == 5 && j == 2) || (i == 9 && j == 1))
+            {
+                barrier.push_back(RectangleShape(Vector2f(50, 50)));
+                barrier.back().setOrigin(25.0, 25.0);
+                barrier.back().setPosition(50 + j*50, 50 + i*50);
+            }
+
+            if ((i == 1 && j == 6) || (i == 1 && j == 8) || (i == 2 && j == 6) || (i == 2 && j == 7) || (i == 2 && j == 8))
+            {
+                barrier.push_back(RectangleShape(Vector2f(50, 50)));
+                barrier.back().setOrigin(25.0, 25.0);
+                barrier.back().setPosition(50 + j*50, 50 + i*50);
+            }
+
+            if ((i == 9 && j == 6) || (i == 9 && j == 8) || (i == 8 && j == 6) || (i == 8 && j == 7) || (i == 8 && j == 8))
+            {
+                barrier.push_back(RectangleShape(Vector2f(50, 50)));
+                barrier.back().setOrigin(25.0, 25.0);
+                barrier.back().setPosition(50 + j*50, 50 + i*50);
+            }
+
+            if ((i == 1 && j == 13) || (i == 1 && j == 12) || (i == 2 && j == 13) || (i == 2 && j == 12))
+            {
+                barrier.push_back(RectangleShape(Vector2f(50, 50)));
+                barrier.back().setOrigin(25.0, 25.0);
+                barrier.back().setPosition(50 + j*50, 50 + i*50);
+            }
+
+            if ((i == 4 && j == 12) || (i == 4 && j == 13) || (i == 5 && j == 12) || (i == 6 && j == 12) || (i == 6 && j == 13))
+            {
+                barrier.push_back(RectangleShape(Vector2f(50, 50)));
+                barrier.back().setOrigin(25.0, 25.0);
+                barrier.back().setPosition(50 + j*50, 50 + i*50);
+            }
+
+            if ((i == 8 && j == 12) || (i == 8 && j == 13) || (i == 9 && j == 12) || (i == 9 && j == 13))
+            {
+                barrier.push_back(RectangleShape(Vector2f(50, 50)));
+                barrier.back().setOrigin(25.0, 25.0);
+                barrier.back().setPosition(50 + j*50, 50 + i*50);
+            }
+
+            if (i == 5 && j == 7)
+            {
+                barrier.push_back(RectangleShape(Vector2f(250, 150)));
+                barrier.back().setOrigin(125, 75);
+                barrier.back().setPosition(50 + j*50, 50 + i*50);
+            }
+
+            //Power Pellets
+            if (i == 1 && j == 7)
+            {
+                dots[i][j].setRadius(7.5);
+                dots[i][j].setOrigin(7.5, 7.5);
+            }
+
+            if (i == 5 && j == 1)
+            {
+                dots[i][j].setRadius(7.5);
+                dots[i][j].setOrigin(7.5, 7.5);
+            }
+
+            if (i == 5 && j == 13)
+            {
+                dots[i][j].setRadius(7.5);
+                dots[i][j].setOrigin(7.5, 7.5);
+            }
+
+            if (i == 9 && j == 7)
+            {
+                dots[i][j].setRadius(7.5);
+                dots[i][j].setOrigin(7.5, 7.5);
+            }
+        }
+    }
+    infile.close();
+    int gridx = 0;
+    int gridy = 0;
+
+    while (window.isOpen()&& !Keyboard::isKeyPressed(Keyboard::Escape))
+        //the main game loop, exits if someone closes the window
+    {
+        Event event; //creates an event object, events include mouse clicks, mouse movement, keyboard presses, etc..
+        while (window.pollEvent(event)) //loop that checks for events
+        {
+            if (event.type == Event::Closed) //checks if window is closed
+
+
+            window.close();
+        } //ends the event loop
+
+        window.clear(); //clears the screen
+
+        if (gamestart == true)
+        {
+            counter++;
+
+            gridx = (Pacman.getPosition().y)/50-1;
+            gridy = (Pacman.getPosition().x)/50-1;
+            cout<<gridx<<" "<<gridy<<endl;
+            grid[gridx][gridy] = 'R';
+
+            //Deals with the score (Bottom left corner)
+            ScoreCounter++;
+            ScoreCounter = ScoreCounter + DotScores;
+            Scores.setString(to_string(ScoreCounter));
+
+            if (ScoreCounter == 10000)
+            {
+                Paclives.push_back(RectangleShape(Vector2f(25, 25)));
+                Paclives.back().setOrigin(12.5, 12.5);
+                Paclives.back().setTexture(&sprites);
+                Paclives.back().setTextureRect(IntRect(1100, 110, 100, 100));
+                Paclives.back().setPosition(PaclivesX, 582.5);
+                PaclivesX = PaclivesX + 25;
+            }
+            //Sets the number of lives for pacman
+            if (Paclives.size() == 0)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    Paclives.push_back(RectangleShape(Vector2f(25, 25)));
+                    Paclives.back().setOrigin(12.5, 12.5);
+                    Paclives.back().setTexture(&sprites);
+                    Paclives.back().setTextureRect(IntRect(1100, 110, 100, 100));
+                    Paclives.back().setPosition(PaclivesX, 582.5);
+                    PaclivesX = PaclivesX + 25;
+                }
+            }
+            //Places the barriers beneath the background so that the hit collision works with the background
+            for (int i = 0; i < barrier.size(); i++)
+            {
+                window.draw(barrier[i]);
+            }
+
+            window.draw(Map);
+            //Makes Pacman look like he is eating
+            Pacman.setTextureRect(IntRect(1100, texty, 100, 100));
+            if (counter%10 == 0)
+            {
+                texty = texty + 100;
+            }
+
+            if (texty == 725)
+            {
+                counter = 0;
+                texty = 125;
+            }
+            //Uses the collision functions so that Pacman does not go through the barriers
+            for (int i = 0; i < barrier.size(); i++)
+            {
+                if (CollisionRight(Pacman, barrier[i], Right) == true)
+                {
+                    Pacmovex1 = 0;
+                    Pacman.setPosition(Pacman.getPosition().x - 12.0, Pacman.getPosition().y);
+
+                }
+
+                if (CollisionLeft(Pacman, barrier[i], Left) == true)
+                {
+                    Pacmovex2 = 0;
+                    Pacman.setPosition(Pacman.getPosition().x + 12.0, Pacman.getPosition().y);
+
+                }
+
+                if (CollisionUp(Pacman, barrier[i], Up) == true)
+                {
+                    Pacmovey1 = 0;
+                    Pacman.setPosition(Pacman.getPosition().x, Pacman.getPosition().y + 12.0);
+
+                }
+
+                if (CollisionDown(Pacman, barrier[i], Down) == true)
+                {
+                    Pacmovey2 = 0;
+                    Pacman.setPosition(Pacman.getPosition().x, Pacman.getPosition().y - 12.0);
+
+                }
+            }
+            //Makes it so pacman cannot move off of the screen
+            if (Pacman.getPosition().x <= 25)
+            {
+                Pacman.setPosition(Pacman.getPosition().x + 25.0, Pacman.getPosition().y);
+            }
+
+            if (Pacman.getPosition().x >= 775)
+            {
+                Pacman.setPosition(Pacman.getPosition().x - 25.0, Pacman.getPosition().y);
+            }
+
+            if (Pacman.getPosition().y <= 25)
+            {
+                Pacman.setPosition(Pacman.getPosition().x, Pacman.getPosition().y + 25.0);
+            }
+
+            if (Pacman.getPosition().y >= 575)
+            {
+                Pacman.setPosition(Pacman.getPosition().x, Pacman.getPosition().y - 25.0);
+            }
+
+//            if (Keyboard::isKeyPressed(Keyboard::Right))
+//            {
+//                move_Right = true;
+//                move_Down = false;
+//                move_Left = false;
+//                move_Up = false;
+//                Pacman.setPosition(gridy*50+50, gridx*50+50);
+//            }
+//            else if (Keyboard::isKeyPressed(Keyboard::Left))
+//            {
+//                move_Right = false;
+//                move_Down = false;
+//                move_Left = true;
+//                move_Up = false;
+//                Pacman.setPosition(gridy*50+50, gridx*50+50);
+//            }
+//            else if (Keyboard::isKeyPressed(Keyboard::Up))
+//            {
+//                move_Right = false;
+//                move_Down = false;
+//                move_Left = false;
+//                move_Up = true;
+//                Pacman.setPosition(gridy*50+50, gridx*50+50);
+//            }
+//            else if (Keyboard::isKeyPressed(Keyboard::Down))
+//            {
+//                move_Right = false;
+//                move_Down = true;
+//                move_Left = false;
+//                move_Up = false;
+//                Pacman.setPosition(gridy*50+50, gridx*50+50);
+//            }
+//
+//            if (move_Right && Right)
+//            {
+//                Pacmovex1 = 2;
+//                Pacmovey1 = 0;
+//            }
+//            else if (move_Left && Left)
+//            {
+//                Pacmovex1 = -2;
+//                Pacmovey1 = 0;
+//            }
+//            else if (move_Up && Up)
+//            {
+//                Pacmovex1 = 0;
+//                Pacmovey1 = -2;
+//            }
+//            else if (move_Down && Down)
+//            {
+//                Pacmovex1 = 0;
+//                Pacmovey1 = 2;
+//            }
+//            else
+//            {
+//                Pacmovex1 = 0;
+//                Pacmovey1 = 0;
+//            }
+
+            //Left Right Up and Down movements
+            if (Right == true && Left == false && Up == false && Down == false)
+            {
+                Pacman.move(Pacmovex1, 0);
+                Pacman.setRotation(0);
+                Pacman.setScale(0.3, 0.3);
+            }
+
+
+            else if (Left == true && Right == false && Up == false && Down == false)
+            {
+                Pacman.move(-Pacmovex2, 0);
+                Pacman.setRotation(-180);
+                Pacman.setScale(0.3, -0.3);
+            }
+
+            else if (Up == true && Right == false && Left == false && Down == false)
+            {
+                Pacman.move(0, -Pacmovey1);
+                Pacman.setRotation(270);
+                Pacman.setScale(0.3, 0.3);
+            }
+
+            else if (Down == true && Up == false && Right == false && Left == false)
+            {
+                Pacman.move(0, Pacmovey2);
+                Pacman.setRotation(90);
+                Pacman.setScale(0.3, 0.3);
+            }
+
+           // Pacman.move(Pacmovex1, Pacmovey1);
+
+            //For when adding the number of points pacman get from food
+            ScoreCounter = ScoreCounter - DotScores;
+            DotScores = 0;
+
+            //Makes it so that when he is turning and such, Pacman stays in the middle of the box
+            for (int i = 0; i < 11; i++)
+            {
+                for (int j = 0; j < 15; j++)
+                {
+                    //Number of points pacman gets from food
+                    if (grid[i][j] == 'R')
+                    {
+                        DotScores = DotScores + 10;
+                    }
+
+                    if (Left != true)
+                        {
+                            if ((Pacman.getPosition().x <= 800)
+                                && (Keyboard::isKeyPressed(Keyboard::Right) == true)
+                                && ((Pacman.getPosition().x) <= (dots[i][j].getPosition().x + dotx))
+                                && (Pacman.getPosition().x >= (dots[i][j].getPosition().x - dotx))
+                                && ((Pacman.getPosition().y) <= (dots[i][j].getPosition().y + dotx))
+                                && ((Pacman.getPosition().y) >= (dots[i][j].getPosition().y - dotx)))
+                            {
+                                Right = true;
+                                Pacmovex1 = 2;
+                                Left = false;
+                                Down = false;
+                                Up = false;
+
+                            }
+                        }
+
+                        if (Left == true)
+                        {
+                            if ((Pacman.getPosition().x <= 800) && (Keyboard::isKeyPressed(Keyboard::Right) == true))
+                            {
+                                Pacmovex1 = 2;
+                                Left = false;
+                                Right = true;
+                                Down = false;
+                                Up = false;
+
+
+                            }
+                        }
+
+                        if (Right != true)
+                        {
+                            if (((Pacman.getPosition().x >= 0) && (Keyboard::isKeyPressed(Keyboard::Left) == true)
+                                && ((Pacman.getPosition().x) <= (dots[i][j].getPosition().x + dotx))
+                                && (Pacman.getPosition().x >= (dots[i][j].getPosition().x - dotx))
+                                && ((Pacman.getPosition().y) <= (dots[i][j].getPosition().y + dotx))
+                                && ((Pacman.getPosition().y) >= (dots[i][j].getPosition().y - dotx))))
+                            {
+                                Pacmovex2 = 2;
+                                Left = true;
+                                Right = false;
+                                Down = false;
+                                Up = false;
+
+
+                            }
+                        }
+
+                        if (Right == true)
+                        {
+                            if ((Pacman.getPosition().x >= 0) && (Keyboard::isKeyPressed(Keyboard::Left) == true))
+                            {
+                                Pacmovex2 = 2;
+                                Left = true;
+                                Right = false;
+                                Down = false;
+                                Up = false;
+                            }
+                        }
+
+                        if (Down != true)
+                        {
+                            if ((Pacman.getPosition().y >= 0) && (Keyboard::isKeyPressed(Keyboard::Up) == true)
+                                && ((Pacman.getPosition().x) <= (dots[i][j].getPosition().x + dotx))
+                                && (Pacman.getPosition().x >= (dots[i][j].getPosition().x - dotx))
+                                && ((Pacman.getPosition().y) <= (dots[i][j].getPosition().y + dotx))
+                                && ((Pacman.getPosition().y) >= (dots[i][j].getPosition().y - dotx)))
+                            {
+                                Pacmovey1 = 2;
+                                Up = true;
+                                Left = false;
+                                Down = false;
+                                Right = false;
+
+                            }
+                        }
+
+                        if (Down == true)
+                        {
+                            if ((Pacman.getPosition().y >= 0) && (Keyboard::isKeyPressed(Keyboard::Up) == true))
+                            {
+                                Pacmovey1 = 2;
+                                Left = false;
+                                Right = false;
+                                Down = false;
+                                Up = true;
+                            }
+                        }
+
+                        if (Up != true)
+                        {
+                            if ((Pacman.getPosition().y <= 600) && (Keyboard::isKeyPressed(Keyboard::Down) == true)
+                                && ((Pacman.getPosition().x) <= (dots[i][j].getPosition().x + dotx))
+                                && (Pacman.getPosition().x >= (dots[i][j].getPosition().x - dotx))
+                                && ((Pacman.getPosition().y) <= (dots[i][j].getPosition().y + dotx))
+                                && ((Pacman.getPosition().y) >= (dots[i][j].getPosition().y - dotx)))
+                            {
+                                Pacmovey2 = 2;
+                                Down = true;
+                                Left = false;
+                                Up = false;
+                                Right = false;
+
+                            }
+                        }
+
+                        if (Up == true)
+                        {
+                            if ((Pacman.getPosition().y <= 600) && (Keyboard::isKeyPressed(Keyboard::Down) == true))
+                            {
+                                Pacmovey2 = 2;
+                                Left = false;
+                                Right = false;
+                                Down = true;
+                                Up = false;
+                            }
+                        }
+
+                    }
+            }
+        }
+
+        //Makes dots on all of the block things
+        for (int i = 0; i < 11; i++)
+        {
+            for (int j = 0; j < 15; j++){
+                if (grid[i][j] == 'P')
+                {
+                    window.draw(dots[i][j]);
+                }
+
+            }
+        }
+        //Draws the pacmans live (Bottom left of the screen)
+        for (int i = 0; i < Paclives.size(); i++)
+        {
+            window.draw(Paclives[i]);
+        }
+
+        window.draw(Scores);
+        window.draw(Pacman);
+
+        window.display(); //displays everything on the video card to the monitor
+        //ends the game loop
+    }
+    return 0;
+
+}
+
+
+
+

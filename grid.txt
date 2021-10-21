@@ -1,0 +1,13 @@
+P P P P P P P P P P P P P P P
+P G Y P P P G P G P P P 0 0 P
+P Y G P P P Y G Y P P P 0 0 P
+P P P P P P P P P P P P P P P
+P G Y P P G T T T Y P P 0 0 P
+P P G P P Y T T T Y P P 0 P P
+P G Y P P G Y Y Y G P P 0 0 P
+P P P P P P P P P P P P P P P
+P Y G P P P Y G Y P P P 0 0 P
+P G Y P P P G P G P P P 0 0 P
+P P P P P P P P P P P P P P P
+
+ 
